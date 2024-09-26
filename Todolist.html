@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List </title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 150h;
+            background-color: #f4f4f4f1;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(3, 2, 2, 0.1);
+            width: 300px;
+        }
+        input[type="text"] {
+            width: calc(100% - 25px);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #161616;
+            border-radius: 3px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button.add {
+            background-color: #1a69e0;
+            color: white;
+        }
+        button.edit {
+            background-color: #ffe607f8;
+            color: white;
+        }
+        button.delete {
+            background-color: #f50f26;
+            color: white;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #d38d8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>To-Do List</h2>
+        <input type="text" id="taskInput" placeholder="Add a new task...">
+        <button class="add" onclick="addTask()">Add</button>
+        <ul id="taskList"></ul>
+    </div>
+
+    <script>
+        // Load tasks from local storage on page load
+        window.onload = function() {
+            loadTasks();
+        };
+
+        // Function to add a task
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskText = taskInput.value.trim();
+
+            if (taskText !== "") {
+                const taskList = document.getElementById('taskList');
+
+                const listItem = createTaskElement(taskText);
+
+                taskList.appendChild(listItem);
+                saveTasks();
+                taskInput.value = ""; // Clear input field after adding task
+            }
+        }
+
+        // Function to create a task element
+        function createTaskElement(taskText) {
+            const listItem = document.createElement('li');
+
+            const taskSpan = document.createElement('span');
+            taskSpan.textContent = taskText;
+
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.classList.add('edit');
+            editButton.onclick = function () {
+                editTask(listItem, taskSpan);
+            };
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete');
+            deleteButton.onclick = function () {
+                deleteTask(listItem);
+            };
+
+            listItem.appendChild(taskSpan);
+            listItem.appendChild(editButton);
+            listItem.appendChild(deleteButton);
+
+            return listItem;
+        }
+
+        // Function to edit a task
+        function editTask(listItem, taskSpan) {
+            const newTaskText = prompt("Edit your task:", taskSpan.textContent);
+            if (newTaskText !== null) {
+                taskSpan.textContent = newTaskText.trim();
+                saveTasks();
+            }
+        }
+
+        // Function to delete a task
+        function deleteTask(listItem) {
+            listItem.remove();
+            saveTasks();
+        }
+
+        // Function to save tasks to local storage
+        function saveTasks() {
+            const taskList = document.getElementById('taskList');
+            const tasks = [];
+            taskList.querySelectorAll('li').forEach(function(listItem) {
+                tasks.push(listItem.querySelector('span').textContent);
+            });
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Function to load tasks from local storage
+        function loadTasks() {
+            const taskList = document.getElementById('taskList');
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.forEach(function(taskText) {
+                const listItem = createTaskElement(taskText);
+                taskList.appendChild(listItem);
+            });
+        }
+    </script>
+</body>
+</html>
